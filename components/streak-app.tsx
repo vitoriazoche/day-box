@@ -33,7 +33,7 @@ export function StreakApp() {
           <span className="text-lg font-bold tracking-tight">Streak</span>
         </div>
         <span className="text-sm text-muted-foreground">
-          Desafio de 30 dias
+          Acompanhamento de 30 dias
         </span>
       </header>
 
@@ -41,19 +41,19 @@ export function StreakApp() {
       <section className="mx-auto max-w-3xl px-6 pb-4 pt-8 text-center sm:pt-14">
         <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 text-sm font-medium text-card-foreground shadow-sm">
           <Sparkles className="size-4 text-accent" />
-          Consistência diária
+          Acompanhamento diário
         </span>
 
         <h1 className="mt-6 text-balance text-5xl font-extrabold leading-[1.05] tracking-tight text-foreground sm:text-6xl">
-          Construa o hábito,
+          Acompanhe seu projeto,
           <br />
           um dia de cada vez
         </h1>
 
         <p className="mx-auto mt-5 max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground">
-          Escolha uma tarefa ou projeto para acompanhar e marque cada dia
-          concluído. 30 casas para 30 dias de consistência — no seu ritmo,
-          seguidos ou não.
+          Dê um nome ao projeto que você quer acompanhar e registre cada dia de
+          trabalho. São 30 casas para 30 dias de acompanhamento — marque, anote
+          o que fez e guarde o link, no seu ritmo, seguidos ou não.
         </p>
 
         {/* Formulário para adicionar tracker */}
@@ -65,8 +65,8 @@ export function StreakApp() {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Ex.: 30 dias de código, ler 20 páginas..."
-            aria-label="Nome da tarefa ou projeto"
+            placeholder="Ex.: 30 dias de código, lançar meu app..."
+            aria-label="Nome do projeto para acompanhar"
             className="h-12 flex-1 rounded-xl border border-input bg-card px-4 text-base text-foreground shadow-sm outline-none transition-shadow placeholder:text-muted-foreground focus:ring-2 focus:ring-ring/40"
           />
           <Button
@@ -86,8 +86,8 @@ export function StreakApp() {
           <div className="mx-auto max-w-md rounded-2xl border border-dashed border-border bg-card/50 p-10 text-center">
             <Flower2 className="mx-auto size-8 text-muted-foreground" />
             <p className="mt-3 text-sm text-muted-foreground">
-              Nenhum acompanhamento ainda. Adicione sua primeira tarefa acima
-              para começar o desafio de 30 dias.
+              Nenhum projeto ainda. Adicione seu primeiro projeto acima para
+              começar o acompanhamento de 30 dias.
             </p>
           </div>
         ) : (

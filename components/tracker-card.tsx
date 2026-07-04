@@ -1,9 +1,17 @@
 'use client'
 
 import { useState } from 'react'
-import { Check, Link2, StickyNote, Trash2 } from 'lucide-react'
+import {
+  Check,
+  Link2,
+  Loader2,
+  Share2,
+  StickyNote,
+  Trash2,
+} from 'lucide-react'
 import { TOTAL_DAYS, type DayEntry, type Tracker } from '@/lib/types'
 import { DayDetailDialog } from '@/components/day-detail-dialog'
+import { generateTrackerImage, slugify } from '@/lib/share-image'
 
 type Props = {
   tracker: Tracker
@@ -19,6 +27,45 @@ export function TrackerCard({
   onRemove,
 }: Props) {
   const [openDay, setOpenDay] = useState<number | null>(null)
+  const [sharing, setSharing] = useState(false)
+
+  async function handleShare() {
+    if (sharing) return
+    setSharing(true)
+    try {
+      const blob = await generateTrackerImage(tracker)
+      const file = new File([blob], `${slugify(tracker.name)}-30-dias.png`, {
+        type: 'image/png',
+      })
+
+      // Usa o compartilhamento nativo quando disponível (celular)
+      if (
+        typeof navigator !== 'undefined' &&
+        navigator.canShare?.({ files: [file] })
+      ) {
+        await navigator.share({
+          files: [file],
+          title: tracker.name,
+          text: `Meu acompanhamento de 30 dias: ${tracker.name}`,
+        })
+      } else {
+        // Fallback: baixa o PNG
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = file.name
+        document.body.appendChild(a)
+        a.click()
+        a.remove()
+        URL.revokeObjectURL(url)
+      }
+    } catch (err) {
+      // usuário cancelou o share nativo ou ocorreu erro — ignora
+      console.log('[v0] share cancelado/erro:', err)
+    } finally {
+      setSharing(false)
+    }
+  }
 
   const doneCount = tracker.days.filter((d) => d.done).length
   const progress = Math.round((doneCount / TOTAL_DAYS) * 100)
@@ -44,14 +91,32 @@ export function TrackerCard({
               : 'comece hoje'}
           </p>
         </div>
-        <button
-          type="button"
-          onClick={onRemove}
-          aria-label={`Remover ${tracker.name}`}
-          className="shrink-0 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-destructive"
-        >
-          <Trash2 className="size-4" />
-        </button>
+        <div className="flex shrink-0 items-center gap-1">
+          <button
+            type="button"
+            onClick={handleShare}
+            disabled={sharing}
+            aria-label={`Compartilhar calendário de ${tracker.name} em PNG`}
+            className="flex items-center gap-1.5 rounded-md px-2 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-accent disabled:opacity-60"
+          >
+            {sharing ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Share2 className="size-4" />
+            )}
+            <span className="hidden sm:inline">
+              {sharing ? 'Gerando…' : 'PNG'}
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={onRemove}
+            aria-label={`Remover ${tracker.name}`}
+            className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-destructive"
+          >
+            <Trash2 className="size-4" />
+          </button>
+        </div>
       </header>
 
       {/* Barra de progresso */}
