@@ -51,9 +51,8 @@ export function StreakApp() {
         </h1>
 
         <p className="mx-auto mt-5 max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground">
-          Dê um nome ao projeto que você quer acompanhar e registre cada dia de
-          trabalho. São 30 casas para 30 dias de acompanhamento — marque, anote
-          o que fez e guarde o link, no seu ritmo, seguidos ou não.
+          Dê um nome ao seu projeto e vá marcando os dias, um a um. Você tem 30
+          no total. Anote o que fez, guarde o link, no seu ritmo.
         </p>
 
         {/* Formulário para adicionar tracker */}
