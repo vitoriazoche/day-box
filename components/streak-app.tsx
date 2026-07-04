@@ -41,7 +41,7 @@ export function StreakApp() {
       {/* Hero */}
       <section className="mx-auto max-w-3xl px-6 pb-4 pt-8 text-center sm:pt-14">
         <div className="mx-auto flex justify-center">
-          <TrackingAnimation className="size-40 sm:size-48" />
+          <TrackingAnimation className="h-40 w-52 sm:h-48 sm:w-64" />
         </div>
 
         <h1 className="mt-2 text-balance text-5xl font-extrabold leading-[1.05] tracking-tight text-foreground sm:text-6xl">
