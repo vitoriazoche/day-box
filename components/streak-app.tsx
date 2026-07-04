@@ -1,10 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { Flower2, Plus, Sparkles } from 'lucide-react'
+import { Flower2, Plus } from 'lucide-react'
 import { useTrackers } from '@/lib/use-trackers'
 import { Button } from '@/components/ui/button'
 import { TrackerCard } from '@/components/tracker-card'
+import { TrackingAnimation } from '@/components/tracking-animation'
 
 export function StreakApp() {
   const {
@@ -39,12 +40,11 @@ export function StreakApp() {
 
       {/* Hero */}
       <section className="mx-auto max-w-3xl px-6 pb-4 pt-8 text-center sm:pt-14">
-        <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 text-sm font-medium text-card-foreground shadow-sm">
-          <Sparkles className="size-4 text-accent" />
-          Acompanhamento diário
-        </span>
+        <div className="mx-auto flex justify-center">
+          <TrackingAnimation className="size-40 sm:size-48" />
+        </div>
 
-        <h1 className="mt-6 text-balance text-5xl font-extrabold leading-[1.05] tracking-tight text-foreground sm:text-6xl">
+        <h1 className="mt-2 text-balance text-5xl font-extrabold leading-[1.05] tracking-tight text-foreground sm:text-6xl">
           Acompanhe seu projeto,
           <br />
           um dia de cada vez
