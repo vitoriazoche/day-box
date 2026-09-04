@@ -24,6 +24,7 @@ export function DayDetailDialog({
 }: Props) {
   const [note, setNote] = useState(entry.note)
   const [link, setLink] = useState(entry.link)
+  const [showError, setShowError] = useState(false)
   const dialogRef = useRef<HTMLDivElement>(null)
 
   // Sincroniza os campos ao abrir um dia diferente
@@ -31,6 +32,7 @@ export function DayDetailDialog({
     if (open) {
       setNote(entry.note)
       setLink(entry.link)
+      setShowError(false)
     }
   }, [open, entry.note, entry.link])
 
@@ -50,6 +52,16 @@ export function DayDetailDialog({
   function handleClose() {
     onSave({ note: note.trim(), link: link.trim() })
     onClose()
+  }
+
+  const isEmpty = !entry.done && !note.trim() && !link.trim()
+
+  function handleSaveAndClose() {
+    if (isEmpty) {
+      setShowError(true)
+      return
+    }
+    handleClose()
   }
 
   function handleClear() {
@@ -81,14 +93,33 @@ export function DayDetailDialog({
               {entry.done ? 'Dia concluído' : 'Registrar este dia'}
             </h2>
           </div>
-          <button
-            type="button"
-            onClick={handleClose}
-            aria-label="Fechar"
-            className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-          >
-            <X className="size-5" />
-          </button>
+          <div className="relative shrink-0">
+            <button
+              type="button"
+              onClick={handleClose}
+              aria-label="Fechar sem registrar"
+              aria-describedby={showError ? 'close-hint' : undefined}
+              className={`rounded-md p-1 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground ${
+                showError ? 'bg-secondary text-foreground ring-2 ring-ring/50' : ''
+              }`}
+            >
+              <X className="size-5" />
+            </button>
+            {showError ? (
+              <div
+                id="close-hint"
+                role="status"
+                className="pointer-events-none absolute right-0 top-full z-10 mt-2 w-44 rounded-lg border border-border bg-card px-3 py-2 text-xs leading-relaxed text-muted-foreground shadow-lg"
+              >
+                <span
+                  aria-hidden="true"
+                  className="absolute -top-1 right-3 size-2 rotate-45 border-l border-t border-border bg-card"
+                />
+                Para fechar sem salvar, use o{' '}
+                <span className="font-semibold text-foreground">X</span> acima.
+              </div>
+            ) : null}
+          </div>
         </div>
 
         <button
@@ -115,10 +146,18 @@ export function DayDetailDialog({
             <textarea
               id="day-note"
               value={note}
-              onChange={(e) => setNote(e.target.value)}
+              onChange={(e) => {
+                setNote(e.target.value)
+                if (showError) setShowError(false)
+              }}
               rows={3}
               placeholder="O que você fez hoje?"
-              className="w-full resize-none rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none transition-shadow placeholder:text-muted-foreground focus:ring-2 focus:ring-ring/40"
+              aria-invalid={showError || undefined}
+              className={`w-full resize-none rounded-lg border bg-background px-3 py-2 text-sm text-foreground outline-none transition-shadow placeholder:text-muted-foreground focus:ring-2 ${
+                showError
+                  ? 'border-destructive focus:ring-destructive/30'
+                  : 'border-input focus:ring-ring/40'
+              }`}
             />
           </div>
 
@@ -133,9 +172,17 @@ export function DayDetailDialog({
               id="day-link"
               type="url"
               value={link}
-              onChange={(e) => setLink(e.target.value)}
+              onChange={(e) => {
+                setLink(e.target.value)
+                if (showError) setShowError(false)
+              }}
               placeholder="https://..."
-              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none transition-shadow placeholder:text-muted-foreground focus:ring-2 focus:ring-ring/40"
+              aria-invalid={showError || undefined}
+              className={`w-full rounded-lg border bg-background px-3 py-2 text-sm text-foreground outline-none transition-shadow placeholder:text-muted-foreground focus:ring-2 ${
+                showError
+                  ? 'border-destructive focus:ring-destructive/30'
+                  : 'border-input focus:ring-ring/40'
+              }`}
             />
             {link.trim() ? (
               <a
@@ -151,6 +198,12 @@ export function DayDetailDialog({
           </div>
         </div>
 
+        {showError ? (
+          <p role="alert" className="mt-4 text-sm text-destructive">
+            Escreva uma nota ou adicione um link para salvar este dia.
+          </p>
+        ) : null}
+
         <div className="mt-6 flex items-center justify-between gap-3">
           <button
             type="button"
@@ -160,7 +213,7 @@ export function DayDetailDialog({
             <Trash2 className="size-3.5" />
             Limpar
           </button>
-          <Button onClick={handleClose}>Salvar e fechar</Button>
+          <Button onClick={handleSaveAndClose}>Salvar e fechar</Button>
         </div>
       </div>
     </div>

@@ -6,15 +6,15 @@ import { TOTAL_DAYS, type Tracker } from '@/lib/types'
  * resultado consistente para compartilhar.
  */
 export function generateTrackerImage(tracker: Tracker): Promise<Blob> {
-  // Paleta (bege quente / carvão) alinhada ao tema da página
-  const BG = '#f3f0e9'
-  const CARD = '#fdfcf8'
-  const BORDER = '#e2ddd2'
-  const CELL_BG = '#ebe7dd'
-  const ACCENT = '#c2703d'
-  const ACCENT_FG = '#fdfcf8'
-  const FG = '#3a352e'
-  const MUTED = '#7d766a'
+  // Paleta (light) alinhada ao tema da página — brand #17B7AB
+  const BG = '#f9fbfb'
+  const CARD = '#eef1f1'
+  const BORDER = '#d9dfde'
+  const CELL_BG = '#e3e7e7'
+  const ACCENT = '#17b7ab'
+  const ACCENT_FG = '#ffffff'
+  const FG = '#1f2e2d'
+  const MUTED = '#5b6664'
 
   const scale = 2 // exporta em 2x para nitidez
   const W = 1080
