@@ -6,6 +6,7 @@ Areas where help is especially valuable:
 - Export optimisations
 - Backend dev (if exist)
 - Performance fixes
+- implement a english version
 
 
 ## How to Contribute
@@ -37,6 +38,7 @@ Areas where help is especially valuable:
      git add .
      git commit -m "Add a brief description of your changes"
      ```
+     * Ps: make in english or brazilian portuguese
 
 7. **Push Your Changes**
    - Push your branch to your forked repository:
