@@ -1,14 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import {
-  Check,
-  Link2,
-  Loader2,
-  Share2,
-  StickyNote,
-  Trash2,
-} from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { Check, Link2, Loader2, Pointer, Share2, Trash2 } from 'lucide-react'
 import { TOTAL_DAYS, type DayEntry, type Tracker } from '@/lib/types'
 import { DayDetailDialog } from '@/components/day-detail-dialog'
 import { generateTrackerImage, slugify } from '@/lib/share-image'
@@ -28,6 +21,43 @@ export function TrackerCard({
 }: Props) {
   const [openDay, setOpenDay] = useState<number | null>(null)
   const [sharing, setSharing] = useState(false)
+
+  // Tooltip que explica a bolinha "tem nota/link, mas o dia não foi concluído".
+  // Abre no hover (desktop) ou ao pressionar o dia por 3s (mobile).
+  const [tipDay, setTipDay] = useState<number | null>(null)
+  const pressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const longPressed = useRef(false)
+
+  useEffect(() => {
+    return () => {
+      if (pressTimer.current) clearTimeout(pressTimer.current)
+    }
+  }, [])
+
+  function clearPressTimer() {
+    if (pressTimer.current) {
+      clearTimeout(pressTimer.current)
+      pressTimer.current = null
+    }
+  }
+
+  function handlePressStart(dayIndex: number, canHint: boolean) {
+    longPressed.current = false
+    if (!canHint) return
+    clearPressTimer()
+    pressTimer.current = setTimeout(() => {
+      longPressed.current = true
+      setTipDay(dayIndex)
+    }, 3000)
+  }
+
+  function handlePressEnd() {
+    clearPressTimer()
+    if (longPressed.current) {
+      // dá tempo de ler antes de sumir (mobile)
+      window.setTimeout(() => setTipDay(null), 3000)
+    }
+  }
 
   async function handleShare() {
     if (sharing) return
@@ -78,7 +108,7 @@ export function TrackerCard({
   }
 
   return (
-    <article className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
+    <article className="@container rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
       <header className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <h3 className="truncate text-lg font-bold text-card-foreground">
@@ -128,15 +158,35 @@ export function TrackerCard({
       </div>
 
       {/* Grade de 30 dias */}
-      <div className="mt-5 grid grid-cols-6 gap-2 sm:grid-cols-10">
+      <div className="mt-5 grid grid-cols-6 gap-2 @md:grid-cols-10">
         {tracker.days.map((day, i) => {
           const hasMeta = Boolean(day.note.trim() || day.link.trim())
+          const canHint = hasMeta && !day.done
           return (
             <button
               key={i}
               type="button"
-              onClick={() => setOpenDay(i)}
-              aria-label={`Dia ${i + 1}${day.done ? ', concluído' : ''}`}
+              onClick={() => {
+                if (longPressed.current) {
+                  longPressed.current = false
+                  return
+                }
+                setOpenDay(i)
+              }}
+              onMouseEnter={() => canHint && setTipDay(i)}
+              onMouseLeave={() =>
+                setTipDay((current) => (current === i ? null : current))
+              }
+              onBlur={() =>
+                setTipDay((current) => (current === i ? null : current))
+              }
+              onTouchStart={() => handlePressStart(i, canHint)}
+              onTouchEnd={handlePressEnd}
+              onTouchMove={clearPressTimer}
+              onTouchCancel={handlePressEnd}
+              aria-label={`Dia ${i + 1}${day.done ? ', concluído' : ''}${
+                canHint ? ', com nota ou link, ainda não concluído' : ''
+              }`}
               aria-pressed={day.done}
               className={`group relative flex aspect-square items-center justify-center rounded-lg border text-sm font-semibold transition-all ${
                 day.done
@@ -152,10 +202,23 @@ export function TrackerCard({
               {hasMeta ? (
                 <span
                   className={`absolute right-1 top-1 flex size-1.5 rounded-full ${
-                    day.done ? 'bg-accent-foreground/70' : 'bg-accent'
+                    day.done ? 'bg-accent-foreground/70' : 'bg-warning'
                   }`}
                   aria-hidden="true"
                 />
+              ) : null}
+              {tipDay === i ? (
+                <span
+                  role="tooltip"
+                  className="pointer-events-none absolute bottom-full left-1/2 z-30 mb-2 w-40 -translate-x-1/2 rounded-lg border border-border bg-popover px-2.5 py-1.5 text-center text-[11px] font-medium leading-snug text-popover-foreground shadow-lg"
+                >
+                  Tem nota ou link adicionado, mas o dia não foi marcado como
+                  concluído.
+                  <span
+                    aria-hidden="true"
+                    className="absolute -bottom-1 left-1/2 size-2 -translate-x-1/2 rotate-45 border-b border-r border-border bg-popover"
+                  />
+                </span>
               ) : null}
             </button>
           )
@@ -165,7 +228,7 @@ export function TrackerCard({
       {/* Legenda */}
       <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
         <span className="inline-flex items-center gap-1.5">
-          <StickyNote className="size-3.5" /> Toque num dia para registrar
+          <Pointer className="size-3.5" /> Toque num dia para registrar
         </span>
         <span className="inline-flex items-center gap-1.5">
           <Link2 className="size-3.5" /> Adicione nota ou link
